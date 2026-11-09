@@ -9,7 +9,9 @@ This repository is a Unity game project named **Stolen in Style**. It is current
 - Input: Unity Input System (**1.14.0**); actions live in `Assets/InputSystem_Actions.inputactions`.
 - Other installed packages include AI Navigation, Timeline, uGUI, Visual Scripting, and Unity Test Framework. Installation does not imply that a feature is used.
 - Current scene: `Assets/Scenes/SampleScene.unity`.
-- Gameplay code: `Assets/Scripts/`; `GameInitializer.cs` is currently an empty MonoBehaviour scaffold.
+- Gameplay code: `Assets/Scripts/`; `GameInitializer.cs` explicitly initializes shared services; scene content is authored directly in scenes.
+- Steam integration: Steamworks.NET **2025.165.0**, pinned in `Packages/manifest.json`. `SteamConnection` is initialized explicitly by `GameInitializer` and persists across scene changes. See `Docs/SteamSetup.md` for configuration and verification.
+- Service and reusable content prefabs: `Assets/Prefabs/`. The sample camera, light, and volume are ordinary objects in `SampleScene`; `SampleSceneContent.prefab` remains available as an optional reusable asset.
 - `Assets/TutorialInfo/` and `Assets/Readme.asset` are Unity template content.
 - Read `Packages/manifest.json` and relevant project settings for the current configuration; update this overview when intentional project changes make it inaccurate.
 
@@ -20,6 +22,20 @@ This repository is a Unity game project named **Stolen in Style**. It is current
 - Read-only access to installed tools and documentation is allowed. If a required tool writes outside this repository, explain the conflict and obtain an explicit exception before running it; do not silently relax this rule.
 - Do not install global tools, upgrade Unity or packages, publish builds, or change remote services unless the user requests it.
 - Preserve existing user changes. Inspect the working tree before editing; do not reset, clean, overwrite unrelated files, or discard work to make a check pass.
+
+## Discuss improvements with the user
+
+- Whenever the user requests something and you see any way to improve it, ask the user about the improvement and suggest alternative solutions before implementing the affected part of the request.
+- Explain the recommended option, why it could be better, and any relevant tradeoffs in clear, concise terms. This applies to design, architecture, implementation, usability, performance, and workflow improvements.
+- Let the user choose the approach; do not silently substitute your preferred solution. Respect decisions already made unless new information reveals another improvement worth discussing.
+
+## Service entry point architecture
+
+- Keep exactly one active `GameInitializer` in each scene used as a standalone entry point. It explicitly initializes shared services such as Steam and reuses services that persist across scene loads.
+- Cameras, lights, UI, gameplay objects, and level content may be authored directly in scenes. Use prefabs when reuse or runtime spawning is useful; scene content does not have to be instantiated by `GameInitializer`.
+- Keep service startup and initialization order explicit and easy to follow from `GameInitializer`. Do not introduce independent bootstrap paths for shared services.
+- `GameInitializer` runs early using `DefaultExecutionOrder(-1000)`. Scripts that need services during `Awake` must run after it and check service availability; initialization can fail. Ordinary scene objects follow Unity's lifecycle and do not require manual initialization through the entry point.
+- For additive loading, keep the service entry point in the entry scene; additive content scenes do not need another initializer.
 
 ## Unity development rules
 
@@ -50,5 +66,6 @@ Project-local skills live in `.agents/skills/`. Read the relevant `SKILL.md` bef
 - `unity-assets-scenes`: Scenes, prefabs, materials, imports, and Unity asset references.
 - `unity-validation`: Debugging, Edit Mode and Play Mode tests, and build verification.
 - `unity-performance`: Profiling and measured CPU, memory, physics, and URP improvements.
+- `unity-security`: Security-first design and review for untrusted input, Steam identity, networking, saves, mods, dependencies, and build credentials. Apply it when work crosses a trust boundary or when a security review is requested.
 
 These skills belong to this repository. Do not copy them to a global skill directory as part of project setup.

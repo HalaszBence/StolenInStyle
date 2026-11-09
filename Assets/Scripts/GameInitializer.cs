@@ -1,16 +1,35 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-1000)]
+[DisallowMultipleComponent]
 public class GameInitializer : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private SteamConnection steamConnectionPrefab;
+
+    public SteamConnection Steam { get; private set; }
+
+    private void Awake()
     {
-        
+        InitializeSteamConnection();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void InitializeSteamConnection()
     {
-        
+        Steam = SteamConnection.Instance;
+
+        if (Steam != null)
+        {
+            return;
+        }
+
+        if (steamConnectionPrefab == null)
+        {
+            Debug.LogError("Assign a SteamConnection prefab to GameInitializer.", this);
+            return;
+        }
+
+        Steam = Instantiate(steamConnectionPrefab);
+        Steam.name = steamConnectionPrefab.name;
+        Steam.Initialize();
     }
 }
