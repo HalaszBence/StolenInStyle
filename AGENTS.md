@@ -12,6 +12,7 @@ This repository is a Unity game project named **Stolen in Style**. It is current
 - Gameplay code: `Assets/Scripts/`; `GameInitializer.cs` explicitly initializes shared services; scene content is authored directly in scenes.
 - Steam integration: Steamworks.NET **2025.165.0**, pinned in `Packages/manifest.json`. `SteamConnection` is initialized explicitly by `GameInitializer` and persists across scene changes. See `Docs/SteamSetup.md` for configuration and verification.
 - Service and reusable content prefabs: `Assets/Prefabs/`. The sample camera, light, and volume are ordinary objects in `SampleScene`; `SampleSceneContent.prefab` remains available as an optional reusable asset.
+- Building hover: each building is a GameObject with `Building`, `SpriteRenderer`, and `PolygonCollider2D`; one `BuildingHoverDetector` reads UI/Point and tints the hovered sprite. Building data is serialized directly on each component. See `Docs/BuildingHover.md` for setup.
 - `Assets/TutorialInfo/` and `Assets/Readme.asset` are Unity template content.
 - Read `Packages/manifest.json` and relevant project settings for the current configuration; update this overview when intentional project changes make it inaccurate.
 
